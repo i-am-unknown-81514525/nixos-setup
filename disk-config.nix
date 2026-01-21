@@ -39,39 +39,39 @@
           compression = "zstd";   # Global zstd compression
           "com.sun:auto-snapshot" = "false";
         };
-        datasets = {
-          # --- Ephemeral / Reproducible Data (Efficiency) ---
-          "local" = {
-            type = "zfs_fs";
-            options = { mountpoint = "none"; copies = "1"; };
-          };
+       datasets = {
           "local/root" = {
             type = "zfs_fs";
             mountpoint = "/";
-            options.mountpoint = "legacy"; # Required for rollback
-            # Create the blank snapshot for ephemeral root
-            postCreateHook = "zfs snapshot zroot/local/root@blank";
+            options = {
+              copies = "1";
+              "com.sun:auto-snapshot" = "false"; # Don't snapshot the OS root
+            };
           };
           "local/nix" = {
             type = "zfs_fs";
             mountpoint = "/nix";
-            options = { atime = "off"; copies = "1"; };
-          };
-
-          # --- Persistent / User Data (Redundancy) ---
-          "safe" = {
-            type = "zfs_fs";
-            options = { mountpoint = "none"; copies = "2"; };
+            options = { 
+              atime = "off"; 
+              copies = "1"; 
+              "com.sun:auto-snapshot" = "false";
+            };
           };
           "safe/home" = {
             type = "zfs_fs";
             mountpoint = "/home";
-            options = { copies = "2"; "com.sun:auto-snapshot" = "true"; };
+            options = { 
+              copies = "2";
+              "com.sun:auto-snapshot" = "false";
+            };
           };
           "safe/persist" = {
             type = "zfs_fs";
             mountpoint = "/persist";
-            options = { copies = "2"; };
+            options = { 
+              copies = "2"; # Extra safety for keys/configs
+              "com.sun:auto-snapshot" = "true"; 
+            };
           };
         };
       };
