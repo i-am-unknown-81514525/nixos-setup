@@ -36,4 +36,15 @@
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "video" ]; # 'wheel' gives you sudo access
   };
+  services.sanoid = {
+    enable = true;
+    interval = "hourly"; # How often to check
+    datasets."zroot/safe/persist" = {
+      hourly = 24;
+      daily = 7;
+      monthly = 3;
+      autoprune = true;
+      autosnap = true;
+    };
+  };
 }
