@@ -8,6 +8,10 @@
 
   # Reset root
   boot.initrd.postDeviceCommands = lib.mkAfter ''
+    # Wait for the device to appear
+    sleep 2 
+    # Try to import if not already there, then rollback
+    zpool import -f zroot || true
     zfs rollback -r zroot/local/root@blank
   '';
   
