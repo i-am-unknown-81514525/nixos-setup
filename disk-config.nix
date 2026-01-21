@@ -3,7 +3,7 @@
     disk = {
       main = {
         type = "disk";
-        device = "/dev/vda"; # QEMU sees vda; label handles it on real hardware
+        device = "/dev/vdb"; # QEMU sees vda; label handles it on real hardware
         content = {
           type = "gpt";
           partitions = {
