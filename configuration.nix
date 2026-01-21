@@ -56,4 +56,9 @@
   networking.networkmanager.enable = true;
   nixpkgs.config.allowUnfree = true; # For WiFi drivers
   system.stateVersion = "24.05";
+
+  users.users.user = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" "video" ]; # 'wheel' gives you sudo access
+  };
 }
