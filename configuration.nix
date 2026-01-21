@@ -12,6 +12,11 @@
   '';
   
   boot.kernelPackages = pkgs.linuxPackages_6_12;
+
+  boot.initrd.availableKernelModules = [ # QEMU
+    "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" # Framework drivers
+    "virtio_pci" "virtio_blk" "virtio_scsi"                # QEMU drivers (for verification)
+  ];
   
   # Limit ZFS ARC to 8GB (value in bytes)
   boot.kernelParams = [ "zfs.zfs_arc_max=8589934592" ];
