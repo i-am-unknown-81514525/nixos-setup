@@ -44,6 +44,7 @@
             type = "zfs_fs";
             mountpoint = "/";
             options = {
+              mountpoint = "legacy";
               copies = "1";
               "com.sun:auto-snapshot" = "false"; # Don't snapshot the OS root
             };
