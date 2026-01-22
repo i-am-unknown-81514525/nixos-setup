@@ -24,8 +24,8 @@
     displayManager.gdm.wayland = true;
 
     # For Plasma (if used)
-    windowManager.plasma5.enable = true;
-    windowManager.plasma5.enableWayland = true;
+    windowManager.plasma6.enable = true;
+    windowManager.plasma6.enableWayland = true;
   };
 
   hardware.opengl = {
