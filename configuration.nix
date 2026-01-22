@@ -2,6 +2,10 @@
   # 1. BOOT & ZFS ROLLBACK
   boot.loader.systemd-boot.enable = true;
   boot.supportedFilesystems = [ "zfs" ];
+
+  boot.initrd.postDeviceCommands = lib.mkAfter ''
+    zpool import -f zroot || true
+  '';
   
   # CRITICAL: Fix ZFS import on different hardware. 
   networking.hostId = "8425e349"; 
