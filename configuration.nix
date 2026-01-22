@@ -15,6 +15,7 @@
   };
 
   networking.hostId = "8425e349"; 
+  networking.hostName = "framework";
   boot.kernelPackages = pkgs.linuxPackages_6_12;
 
   # 2. GRAPHICS FIX
