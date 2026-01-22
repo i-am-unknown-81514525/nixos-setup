@@ -59,7 +59,7 @@
   system.stateVersion = "24.05";
 
   users.users.root.initialPassword = "nixos";
-
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
   users.users.user = {
     isNormalUser = true;
     extraGroups = [ "wheel" "networkmanager" "video" ]; # 'wheel' gives you sudo access
