@@ -74,4 +74,8 @@
       autosnap = true;
     };
   };
+  nixpkgs.config.allowUnfree = true;
+  environment.systemPackages = [
+    pkgs.cloudflare-warp
+  ];
 }
