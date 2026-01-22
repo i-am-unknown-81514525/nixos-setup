@@ -43,12 +43,18 @@ If you don't specify `--root`, it defaults to `/mnt`. This is because:
 Based on your repository, the typical workflow is:
 
 1. **Boot from NixOS live media** (your running system is at `/`)
-2. **Run Disko** (`cmd1.sh`): Formats and mounts the new system at `/mnt`
-3. **Install NixOS**: Copy configuration files to `/mnt/etc/nixos/` and run:
+2. **Clone or copy this repository** to access the configuration files
+3. **Run Disko** (using `cmd1.sh`): Formats and mounts the new system at `/mnt`
+   ```bash
+   cd /path/to/this/repo
+   bash cmd1.sh
+   ```
+4. **Install NixOS** from the repository directory:
    ```bash
    sudo nixos-install --flake .#framework
    ```
-4. **Enter the new system** (optional, for troubleshooting):
+   Note: The `#framework` refers to the configuration name defined in `flake.nix`
+5. **Enter the new system** (optional, for troubleshooting):
    ```bash
    sudo nixos-enter
    ```
@@ -56,9 +62,9 @@ Based on your repository, the typical workflow is:
 
 ## How to Use a Different Mount Point
 
-If you wanted to use a different location instead of `/mnt`, you would:
+If you wanted to use a different location instead of `/mnt`, you would need to:
 
-1. **Tell Disko where to mount** (not directly supported, but you could mount manually)
+1. **Mount manually or modify Disko's behavior**: Disko uses `/mnt` by default. While you can manually mount filesystems elsewhere after Disko creates them, it's simpler to stick with the convention.
 2. **Tell nixos-enter**:
    ```bash
    sudo nixos-enter --root /my/custom/path
