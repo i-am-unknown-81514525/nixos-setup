@@ -3,74 +3,71 @@
   boot.loader.systemd-boot.enable = true;
   boot.supportedFilesystems = [ "zfs" ];
 
+  # Note: It is often better to use 'postResumeCommands' to avoid race conditions
   boot.initrd.postDeviceCommands = lib.mkAfter ''
     zpool import -f zroot || true
   '';
+
   fileSystems."/etc/nixos" = {
     device = "/persist/etc/nixos";
     fsType = "none";
     options = [ "bind" ];
   };
-  # CRITICAL: Fix ZFS import on different hardware. 
-  networking.hostId = "8425e349"; 
 
+  networking.hostId = "8425e349"; 
   boot.kernelPackages = pkgs.linuxPackages_6_12;
 
-  services.xserver = {
+  # 2. DESKTOP SERVICES
+  services.xserver.enable = true;
+  
+  # MODERN WAY: Display Manager and Desktop Manager are separate
+  services.displayManager.gdm.enable = true;
+  services.displayManager.gdm.wayland = true;
+
+  # FIX: Plasma is now a Desktop Manager, and 'plasma6' is the modern name
+  services.desktopManager.plasma6.enable = true;
+
+  # 3. GRAPHICS (MODERN SYNTAX)
+  # hardware.opengl was renamed to hardware.graphics in 24.11
+  hardware.graphics = {
     enable = true;
-
-    # Enable Wayland
-    displayManager.gdm.enable = true; # GNOME Display Manager (required for GNOME or Plasma Wayland)
-    displayManager.gdm.wayland = true;
-
-    # For Plasma (if used)
-    windowManager.plasma6.enable = true;
-    windowManager.plasma6.enableWayland = true;
-  };
-
-  hardware.opengl = {
-    enable = true;          # Enable OpenGL rendering
-    driSupport = true;      # Enable Direct Rendering Interface (DRI) for hardware-accelerated graphics
-    driSupport32Bit = true; # Enable 32-bit support for Vulkan (for gaming or specific needs)
+    enable32Bit = true; # Replaces driSupport32Bit
+    # driSupport is no longer needed/has no effect in 24.11
+    
     extraPackages = with pkgs; [
-      vulkan-validation-layers # Optional, for Vulkan debug tools
-      vulkan-loader            # Vulkan loader
-      vulkan-tools             # Tools for Vulkan testing (e.g., `vkcube`)
-      mesa.vulkanDrivers       # Add default Mesa Vulkan drivers for your GPU
+      vulkan-validation-layers
+      vulkan-loader
+      vulkan-tools
+      mesa.vulkanDrivers
     ];
   };
 
-  boot.initrd.availableKernelModules = [ # QEMU
-    "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" # Framework drivers
-    "virtio_pci" "virtio_blk" "virtio_scsi"  "virtio_gpu"              # QEMU drivers (for verification)
+  # 4. SYSTEM & DRIVERS
+  boot.initrd.availableKernelModules = [ 
+    "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" 
+    "virtio_pci" "virtio_blk" "virtio_scsi"  "virtio_gpu"
   ];
   
-  # Limit ZFS ARC to 8GB (value in bytes)
   boot.kernelParams = [ "zfs.zfs_arc_max=8589934592" ];
 
-  # 2. GRAPHICS & NIRI
   programs.niri.enable = true;
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
-  
-  # 4. NIX-LD (Binary Compatibility)
   programs.nix-ld.enable = true;
   
   networking.networkmanager.enable = true;
-  nixpkgs.config.allowUnfree = true; # For WiFi drivers
+  nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.05";
 
+  # 5. USERS & STORAGE
   users.users.root.initialPassword = "nixos";
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   users.users.user = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" ]; # 'wheel' gives you sudo access
+    extraGroups = [ "wheel" "networkmanager" "video" ];
   };
+
   services.sanoid = {
     enable = true;
-    interval = "hourly"; # How often to check
+    interval = "hourly";
     datasets."zroot/safe/persist" = {
       hourly = 24;
       daily = 7;
