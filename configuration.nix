@@ -1,9 +1,9 @@
 { config, pkgs, lib, inputs,... }: {
-  # 1. BOOT & ZFS ROLLBACK
+  # 1. BOOT & ZFS
   boot.loader.systemd-boot.enable = true;
   boot.supportedFilesystems = [ "zfs" ];
 
-  # Note: It is often better to use 'postResumeCommands' to avoid race conditions
+  # ZFS Rollback / Import logic
   boot.initrd.postDeviceCommands = lib.mkAfter ''
     zpool import -f zroot || true
   '';
@@ -17,35 +17,32 @@
   networking.hostId = "8425e349"; 
   boot.kernelPackages = pkgs.linuxPackages_6_12;
 
-  # 2. DESKTOP SERVICES
-  services.xserver.enable = true;
-  
-  # MODERN WAY: Display Manager and Desktop Manager are separate
-  services.displayManager.gdm.enable = true;
-  services.displayManager.gdm.wayland = true;
-
-  # FIX: Plasma is now a Desktop Manager, and 'plasma6' is the modern name
-  services.desktopManager.plasma6.enable = true;
-
-  # 3. GRAPHICS (MODERN SYNTAX)
-  # hardware.opengl was renamed to hardware.graphics in 24.11
+  # 2. GRAPHICS FIX
+  # The error in your image happens because mesa.vulkanDrivers is not a package.
+  # On modern NixOS, the default drivers are included automatically.
   hardware.graphics = {
     enable = true;
-    enable32Bit = true; # Replaces driSupport32Bit
-    # driSupport is no longer needed/has no effect in 24.11
-    
+    enable32Bit = true;
     extraPackages = with pkgs; [
       vulkan-validation-layers
       vulkan-loader
       vulkan-tools
-      mesa.vulkanDrivers
+      # Removed mesa.vulkanDrivers as it causes the 'not of type package' error
     ];
   };
 
-  # 4. SYSTEM & DRIVERS
+  # 3. DESKTOP SERVICES FIX
+  services.xserver.enable = true;
+  services.displayManager.gdm.enable = true;
+  services.displayManager.gdm.wayland = true;
+
+  # Plasma 6 is now a Desktop Manager, not a Window Manager
+  services.desktopManager.plasma6.enable = true;
+
+  # 4. SYSTEM & HARDWARE
   boot.initrd.availableKernelModules = [ 
     "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" 
-    "virtio_pci" "virtio_blk" "virtio_scsi"  "virtio_gpu"
+    "virtio_pci" "virtio_blk" "virtio_scsi" "virtio_gpu"
   ];
   
   boot.kernelParams = [ "zfs.zfs_arc_max=8589934592" ];
@@ -57,7 +54,7 @@
   nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.05";
 
-  # 5. USERS & STORAGE
+  # 5. USERS
   users.users.root.initialPassword = "nixos";
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   users.users.user = {
@@ -65,6 +62,7 @@
     extraGroups = [ "wheel" "networkmanager" "video" ];
   };
 
+  # 6. PERSISTENCE SNAPSHOTS
   services.sanoid = {
     enable = true;
     interval = "hourly";
