@@ -52,7 +52,6 @@
   programs.nix-ld.enable = true;
   
   networking.networkmanager.enable = true;
-  nixpkgs.config.allowUnfree = true;
   system.stateVersion = "24.05";
 
   # 5. USERS
