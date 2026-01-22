@@ -12,9 +12,33 @@
 
   boot.kernelPackages = pkgs.linuxPackages_6_12;
 
+  services.xserver = {
+    enable = true;
+
+    # Enable Wayland
+    displayManager.gdm.enable = true; # GNOME Display Manager (required for GNOME or Plasma Wayland)
+    displayManager.gdm.wayland = true;
+
+    # For Plasma (if used)
+    windowManager.plasma5.enable = true;
+    windowManager.plasma5.enableWayland = true;
+  };
+
+  hardware.opengl = {
+    enable = true;          # Enable OpenGL rendering
+    driSupport = true;      # Enable Direct Rendering Interface (DRI) for hardware-accelerated graphics
+    driSupport32Bit = true; # Enable 32-bit support for Vulkan (for gaming or specific needs)
+    extraPackages = with pkgs; [
+      vulkan-validation-layers # Optional, for Vulkan debug tools
+      vulkan-loader            # Vulkan loader
+      vulkan-tools             # Tools for Vulkan testing (e.g., `vkcube`)
+      mesa.vulkanDrivers       # Add default Mesa Vulkan drivers for your GPU
+    ];
+  };
+
   boot.initrd.availableKernelModules = [ # QEMU
     "nvme" "xhci_pci" "thunderbolt" "usb_storage" "sd_mod" # Framework drivers
-    "virtio_pci" "virtio_blk" "virtio_scsi"                # QEMU drivers (for verification)
+    "virtio_pci" "virtio_blk" "virtio_scsi"  "virtio_gpu"              # QEMU drivers (for verification)
   ];
   
   # Limit ZFS ARC to 8GB (value in bytes)
