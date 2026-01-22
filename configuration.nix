@@ -6,7 +6,11 @@
   boot.initrd.postDeviceCommands = lib.mkAfter ''
     zpool import -f zroot || true
   '';
-  
+  fileSystems."/etc/nixos" = {
+    device = "/persist/etc/nixos";
+    fsType = "none";
+    options = [ "bind" ];
+  };
   # CRITICAL: Fix ZFS import on different hardware. 
   networking.hostId = "8425e349"; 
 
