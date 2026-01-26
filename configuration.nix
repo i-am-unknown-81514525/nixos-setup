@@ -108,7 +108,7 @@
   ];
   fonts.fontconfig = {
     enable = true;
-    defaultFOnts = {
+    defaultFonts = {
       emoji = [ "Noto Color Emoji" ];
     };
   };
