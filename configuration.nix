@@ -77,10 +77,12 @@
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = [
     pkgs.cloudflare-warp
+    pkgs.systemd
   ];
   boot.kernelPackages = pkgs.linuxPackages_latest;
   networking.networkmanager.enable = true;
   networking.wireless.enable = false;
   hardware.enableRedistributableFirmware = true;
   boot.kernelParams = [ "pcie_aspm=off" ];
+  services.cloudflare-warp.enable = true;
 }
