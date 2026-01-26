@@ -78,4 +78,9 @@
   environment.systemPackages = [
     pkgs.cloudflare-warp
   ];
+  boot.kernelPackages = pkgs.linuxPackages_latest;
+  networking.networkmanager.enable = true;
+  networking.wireless.enable = false;
+  hardware.enableRedistributableFirmware = true;
+  boot.kernelParams = [ "pcie_aspm=off" ];
 }
