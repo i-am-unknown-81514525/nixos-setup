@@ -78,11 +78,38 @@
   environment.systemPackages = [
     pkgs.cloudflare-warp
     pkgs.systemd
+    pkgs.cacert
+    pkgs.alacritty-graphics
+    pkgs.fuzzel
+    pkgs.swaylock
   ];
-  boot.kernelPackages = pkgs.linuxPackages_latest;
-  networking.networkmanager.enable = true;
-  networking.wireless.enable = false;
+  # boot.kernelPackages = pkgs.linuxPackages_latest;
+  # networking.networkmanager.enable = true;
+  # networking.wireless.enable = false;
   hardware.enableRedistributableFirmware = true;
-  boot.kernelParams = [ "pcie_aspm=off" ];
+  # boot.kernelParams = [ "pcie_aspm=off" ];
   services.cloudflare-warp.enable = true;
+
+  services.libinput = {
+    enable = true;
+
+    touchpad = {
+      tapping = true;
+      naturalScrolling = true;
+      middleEmulation = true;
+      disableWhileTyping = true;
+    };
+  };
+  hardware.bluetooth.enable = true;
+  hardware.bluetooth.powerOnBoot = true;
+  security.pam.services.login.kwallet.enable = true;
+  fonts.packages = with pkgs; [
+    noto-fonts-color-emoji
+  ];
+  fonts.fontconfig = {
+    enable = true;
+    defaultFOnts = {
+      emoji = [ "Noto Color Emoji" ];
+    };
+  };
 }
