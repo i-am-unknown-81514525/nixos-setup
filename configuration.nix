@@ -24,12 +24,17 @@
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
-    extraPackages = with pkgs; [
-      vulkan-validation-layers
-      vulkan-loader
-      vulkan-tools
-      # Removed mesa.vulkanDrivers as it causes the 'not of type package' error
-    ];
+#     extraPackages = with pkgs; [
+#       vulkan-validation-layers
+#       vulkan-loader
+#       vulkan-tools
+#       # Removed mesa.vulkanDrivers as it causes the 'not of type package' error
+#     ];
+  };
+
+  environment.sessionVariables = {
+    NIXOS_OZONE_WL = "1";
+    GDK_BACKEND = "wayland";
   };
 
   # 3. DESKTOP SERVICES FIX
@@ -59,7 +64,7 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   users.users.user = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "input" ];
   };
 
   # 6. PERSISTENCE SNAPSHOTS
@@ -105,6 +110,7 @@
   security.pam.services.login.kwallet.enable = true;
   fonts.packages = with pkgs; [
     noto-fonts-color-emoji
+    font-awesome
   ];
   fonts.fontconfig = {
     enable = true;
@@ -130,4 +136,9 @@
     </alias>
   </fontconfig>
 '';
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 53317 ];
+    allowedUDPPorts = [ 53317 ];
+  };
 }
