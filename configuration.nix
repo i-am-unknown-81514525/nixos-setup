@@ -108,6 +108,7 @@
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
   security.pam.services.login.kwallet.enable = true;
+  security.pam.services.gdm.enableKwallet = true;
   fonts.packages = with pkgs; [
     noto-fonts-color-emoji
     font-awesome
@@ -141,4 +142,5 @@
     allowedTCPPorts = [ 53317 ];
     allowedUDPPorts = [ 53317 ];
   };
+  nix.settings.trusted-users = ["user" "admin" "root"];
 }
