@@ -12,6 +12,11 @@
     niri.url = "github:sodiboo/niri-flake";
     
     impermanence.url = "github:nix-community/impermanence";
+
+    compose2nix = {
+      url = "github:aksiksi/compose2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = { self, nixpkgs,... }@inputs: {
@@ -25,6 +30,7 @@
       ./disk-config.nix
       ./configuration.nix
       ];
+
     };
   };
 }

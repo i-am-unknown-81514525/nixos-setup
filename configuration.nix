@@ -64,7 +64,11 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   users.users.user = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" "video" "input" ];
+    extraGroups = [ "wheel" "networkmanager" "video" "input" "libvertd" "kvm" "docker" ];
+  };
+
+  users.users.guest = {
+    isNormalUser = true;
   };
 
   # 6. PERSISTENCE SNAPSHOTS
@@ -87,6 +91,9 @@
     pkgs.alacritty-graphics
     pkgs.fuzzel
     pkgs.swaylock
+    pkgs.swtpm
+    pkgs.disko
+    inputs.compose2nix.packages.x86_64-linux.default
   ];
   # boot.kernelPackages = pkgs.linuxPackages_latest;
   # networking.networkmanager.enable = true;
@@ -102,21 +109,32 @@
       tapping = true;
       naturalScrolling = true;
       middleEmulation = true;
-      disableWhileTyping = true;
+      disableWhileTyping = false;
     };
   };
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
   security.pam.services.login.kwallet.enable = true;
   security.pam.services.gdm.enableKwallet = true;
+  fonts.fontDir.enable = true;
   fonts.packages = with pkgs; [
     noto-fonts-color-emoji
     font-awesome
+    noto-fonts
+    noto-fonts-cjk-sans
+    noto-fonts-cjk-serif
+    sarasa-gothic  # Great for coding (monospaced CJK)
+    source-han-sans
+    source-han-serif
+    liberation_ttf
   ];
   fonts.fontconfig = {
     enable = true;
     defaultFonts = {
       emoji = [ "Noto Color Emoji" ];
+      serif = [ "Noto Serif" "Noto Serif CJK SC" ];
+      sansSerif = [ "Noto Sans" "Noto Sans CJK SC" ];
+      monospace = [ "Noto Sans Mono" "Sarasa Mono SC" ];
     };
   };
   fonts.fontconfig.localConf = ''
@@ -143,4 +161,37 @@
     allowedUDPPorts = [ 53317 ];
   };
   nix.settings.trusted-users = ["user" "admin" "root"];
+
+  zramSwap = {
+    enable = true;
+    algorithm = "zstd";
+    memoryPercent = 150;
+  };
+
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu = {
+      package = pkgs.qemu_kvm;
+      runAsRoot = true;
+      swtpm.enable = true;
+    };
+  };
+  programs.virt-manager.enable = true;
+
+  boot.kernel.sysctl = {
+    "vm.swappiness" = 180;
+    "vm.page-cluster" = 0;
+  };
+
+  virtualisation.docker = {
+    enable = true;
+    daemon.settings = {
+      dns = [ "1.1.1.1" "8.8.8.8" ];
+      log-driver = "journald";
+      registry-mirrors = [ "https://mirror.gcr.io" ];
+      storage-driver = "overlay2";
+    };
+    storageDriver = "zfs";
+  };
+
 }
