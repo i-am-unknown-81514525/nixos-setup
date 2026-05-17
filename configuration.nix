@@ -4,9 +4,19 @@
   boot.supportedFilesystems = [ "zfs" ];
 
   # ZFS Rollback / Import logic
-  boot.initrd.postDeviceCommands = lib.mkAfter ''
-    zpool import -f zroot || true
-  '';
+#   boot.initrd.systemd.services.zpool-import-force = {
+#   description = "Force import zroot ZFS pool";
+#   wantedBy = [ "initrd.target" ];
+#   after = [ "systemd-udev-settle.service" ];
+#   before = [ "sysroot.mount" ];
+#   path = [ pkgs.zfs ];
+#   unitConfig.DefaultDependencies = "no";
+#   serviceConfig = {
+#     Type = "oneshot";
+#     RemainAfterExit = true;
+#     ExecStart = "${pkgs.zfs}/bin/zpool import -f zroot";
+#   };
+# };
 
   fileSystems."/etc/nixos" = {
     device = "/persist/etc/nixos";
